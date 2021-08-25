@@ -14,7 +14,11 @@ void Gauge::Decrement() { Decrement(1.0); }
 
 void Gauge::Decrement(const double value) { Change(-1.0 * value); }
 
-void Gauge::Set(const double value) { value_.store(value); }
+void Gauge::Set(const double value, const std::int64_t timestamp_ms)
+{
+    value_.store(value);
+    timestamp_ms_.store(timestamp_ms);
+}
 
 void Gauge::Change(const double value) {
   auto current = value_.load();
@@ -29,9 +33,12 @@ void Gauge::SetToCurrentTime() {
 
 double Gauge::Value() const { return value_; }
 
+std::int64_t Gauge::Timestamp() const { return timestamp_ms_; }
+
 ClientMetric Gauge::Collect() const {
   ClientMetric metric;
   metric.gauge.value = Value();
+  metric.timestamp_ms = Timestamp();
   return metric;
 }
 
